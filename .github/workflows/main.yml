@@ -22,6 +22,7 @@ jobs:
         packages: >
           go-do
           throne
+          fastfetch-git
 
     - name: List generated Files
       run: ls -1 > ${{ github.workspace }}/files.txt
