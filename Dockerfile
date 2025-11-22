@@ -47,7 +47,8 @@ RUN \
     gpg --import /tmp/gpg_key_6BC26A17B9B7018A.gpg.asc && \
     cd /tmp/ && \
     # curl --output aurutils.tar.gz https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz && \
-    curl -L --output aurutils.tar.gz https://aur.archlinux.org/cgit/aur.git/plain/aurutils.tar.gz?h=aurutils && \
+    # curl -L --output aurutils.tar.gz https://aur.archlinux.org/cgit/aur.git/plain/aurutils.tar.gz?h=aurutils && \
+    curl -L --output aurutils.tar.gz https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz && \
     tar xf aurutils.tar.gz && \
     cd aurutils && \
     makepkg --syncdeps --noconfirm && \
