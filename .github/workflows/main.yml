@@ -1,26 +1,48 @@
-name: Test building simple packages from AUR.
+name: Build AUR Packages
 
 on:
   push:
+    branches: [ main ]
+  workflow_dispatch:           # чтобы можно было запускать вручную
   schedule:
-    - cron: "17 2 * * 0"
+    - cron: "17 2 * * 0"        # каждый воскресенье в 2:17 UTC — оставь как есть
 
 jobs:
   build_repository:
     runs-on: ubuntu-latest
-    steps:
+    permissions:
+      contents: write           # обязательно для релизов и gh-pages
 
-    # Checkout repository content to run the action directly from the
-    # repository.  This makes sure, that this runs the latest/current version
-    # of the action, rather than a tagged/released one.
+    steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Build Packages
-      uses: ./  # Use action from the root of this repository
+      id: build
+      uses: ./
       with:
-        packages: >
+        packages: |
           fastfetch-git
+          google-chrome
+          spotify
+          nvidia-container-toolkit-bin
+          # ← сюда просто добавляй свои пакеты, каждый с новой строки
 
-    - name: List generated Files
-      run: ls -1 > ${{ github.workspace }}/files.txt
+    - name: Publish to Releases
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest AUR build
+        prerelease: true
+        files: |
+          ${{ steps.build.outputs.package_dir }}/*.pkg.tar.zst
+          ${{ steps.build.outputs.package_dir }}/aurci2.db*
+          ${{ steps.build.outputs.package_dir }}/aurci2.files*
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ steps.build.outputs.package_dir }}
+        publish_branch: gh-pages
+        force_orphan: true
